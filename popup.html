@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Changer</title>
+    <link rel="stylesheet" href="lib/leaflet.css" />
+    <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <div class="icon-pulse"></div>
+                <h1>Location Changer</h1>
+            </div>
+            <label class="switch" title="Toggle Location Spoofing">
+                <input type="checkbox" id="toggleSpoof">
+                <span class="slider round"></span>
+            </label>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search street, city or country..." autocomplete="off">
+            <div id="searchResults" class="search-results hidden"></div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-overlay" id="mapOverlay">
+                <span>Location Spoofing is OFF</span>
+            </div>
+        </div>
+
+        <div class="coords-display">
+            <div class="coord-item">
+                <span class="coord-label">LATITUDE</span>
+                <input type="number" id="latInput" step="0.000001">
+            </div>
+            <div class="coord-item">
+                <span class="coord-label">LONGITUDE</span>
+                <input type="number" id="lngInput" step="0.000001">
+            </div>
+        </div>
+
+        <button id="saveBtn" class="primary-btn">Update Location</button>
+    </div>
+
+    <script src="lib/leaflet.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
