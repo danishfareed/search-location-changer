@@ -70,6 +70,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                                 type: "UPDATE_GEO",
                                 data: data
                             }).catch(() => { });
+
+                            // Force reload Google Search tabs to ensure UULE cookie logic from headers is applied instantly
+                            if (tab.url && tab.url.includes("google.com/search")) {
+                                chrome.tabs.reload(tab.id);
+                            }
                         } catch (e) { }
                     }
                 });
