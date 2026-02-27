@@ -2,13 +2,13 @@
 ![Version](https://img.shields.io/badge/version-1.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-A premium, open-source Google Chrome extension that allows you to spoof and lock your browser's HTML5 Geolocation. Works entirely out of the box with zero configuration required.
+A premium, open-source Google Chrome extension that allows you to simulate and lock your browser's HTML5 Geolocation. Works entirely out of the box with zero configuration required.
 
 ## Features
 - 🌍 **Search Anywhere:** Type any city, street, or neighborhood using the integrated OpenStreetMap Nominatim search.
 - 📍 **Interactive Map:** Pick or fine-tune your desired coordinates visually on a map (via Leaflet).
 - 🔓 **No API Keys Required:** Uses completely free services (OSM & Leaflet).
-- ⚙️ **Robust Spoofing:** Injects directly into the page's execution environment to override `navigator.geolocation`, bypassing typical restrictions and avoiding Chrome's "Yellow Debugger Bar".
+- ⚙️ **Robust Override:** Injects directly into the page's execution environment to override `navigator.geolocation`, bypassing typical restrictions and avoiding Chrome's "Yellow Debugger Bar".
 - 🎨 **Premium UI:** Features a sleek dark mode, glassmorphism aesthetics, and smooth animations.
 
 ## Installation
@@ -21,7 +21,7 @@ A premium, open-source Google Chrome extension that allows you to spoof and lock
 ## Usage
 1. Click the extension icon in your browser toolbar.
 2. Search for your desired location or click anywhere on the interactive map.
-3. Click the toggle switch at the top to turn Location Spoofing **ON**.
+3. Click the toggle switch at the top to turn Location Override **ON**.
 4. The extension will automatically intercept location requests from websites and provide them with your selected coordinates.
 
 ## How it works
