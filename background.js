@@ -7,6 +7,44 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
+function genUULE(latFloat, lngFloat) {
+    const lat = Math.floor(latFloat * 1e7) || 407127760;
+    const lng = Math.floor(lngFloat * 1e7) || -740059740;
+    const decodedXgeo = 'role: CURRENT_LOCATION\nproducer: DEVICE_LOCATION\nradius: 65000\nlatlng <\n  latitude_e7: ' + lat + '\n  longitude_e7: ' + lng + '\n>';
+    const encodedXgeo = 'a ' + btoa(decodedXgeo);
+    return encodedXgeo;
+}
+
+function updateNetRules(enabled, lat, lng) {
+    if (enabled) {
+        chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [1],
+            addRules: [{
+                "id": 1,
+                "priority": 1,
+                "action": {
+                    "type": "modifyHeaders",
+                    "requestHeaders": [
+                        {
+                            "header": "x-geo",
+                            "operation": "set",
+                            "value": genUULE(lat, lng)
+                        }
+                    ]
+                },
+                "condition": {
+                    "urlFilter": "google.com/",
+                    "resourceTypes": ["main_frame", "sub_frame", "xmlhttprequest", "ping"]
+                }
+            }]
+        });
+    } else {
+        chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [1]
+        });
+    }
+}
+
 function updateBadgeStatus(enabled) {
     if (enabled) {
         chrome.action.setBadgeText({ text: 'ON' });
@@ -19,9 +57,9 @@ function updateBadgeStatus(enabled) {
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "TOGGLE_STATE_CHANGED" || request.type === "LOCATION_UPDATED") {
-
         chrome.storage.local.get(['enabled', 'lat', 'lng'], (data) => {
             updateBadgeStatus(data.enabled);
+            updateNetRules(data.enabled, data.lat, data.lng);
 
             // Notify all active tabs to update injected settings if they are already loaded
             chrome.tabs.query({}, (tabs) => {
@@ -31,9 +69,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                             chrome.tabs.sendMessage(tab.id, {
                                 type: "UPDATE_GEO",
                                 data: data
-                            }).catch(() => {
-                                // Ignore errors for tabs without content script
-                            });
+                            }).catch(() => { });
                         } catch (e) { }
                     }
                 });
@@ -42,7 +78,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-// Initial badge state
-chrome.storage.local.get(['enabled'], (data) => {
+// Initial badge and rules state
+chrome.storage.local.get(['enabled', 'lat', 'lng'], (data) => {
     updateBadgeStatus(data.enabled);
+    updateNetRules(data.enabled, data.lat, data.lng);
 });
