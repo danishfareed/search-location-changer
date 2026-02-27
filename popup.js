@@ -64,7 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Toggle Handler
     toggleSpoof.addEventListener('change', async (e) => {
         const enabled = e.target.checked;
-        await chrome.storage.local.set({ enabled });
+        const lat = parseFloat(latInput.value) || data.lat;
+        const lng = parseFloat(lngInput.value) || data.lng;
+
+        await chrome.storage.local.set({ enabled, lat, lng });
         updateOverlay();
         // Send message to background to notify active tabs
         chrome.runtime.sendMessage({ type: "TOGGLE_STATE_CHANGED" });
