@@ -71,8 +71,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                                 data: data
                             }).catch(() => { });
 
-                            // Force reload Google Search tabs to ensure UULE cookie logic from headers is applied instantly
-                            if (tab.url && tab.url.includes("google.com/search")) {
+                            // Force reload Google Search ONLY if it's the currently active tab
+                            if (tab.active && tab.url && tab.url.includes("google.com/search")) {
                                 chrome.tabs.reload(tab.id);
                             }
                         } catch (e) { }
