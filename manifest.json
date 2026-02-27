@@ -5,7 +5,6 @@
   "description": "Override your browser HTML5 geolocation. Search and lock to any location worldwide.",
   "permissions": [
     "storage",
-    "scripting",
     "activeTab",
     "declarativeNetRequest"
   ],

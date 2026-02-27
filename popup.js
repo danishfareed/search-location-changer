@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         map = L.map('map').setView([lat, lng], 13);
-        
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
@@ -46,16 +46,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             const position = marker.getLatLng();
             latInput.value = position.lat.toFixed(6);
             lngInput.value = position.lng.toFixed(6);
+            reverseGeocode(position.lat, position.lng);
         });
 
-        map.on('click', function(e) {
+        map.on('click', function (e) {
             marker.setLatLng(e.latlng);
             latInput.value = e.latlng.lat.toFixed(6);
             lngInput.value = e.latlng.lng.toFixed(6);
+            reverseGeocode(e.latlng.lat, e.latlng.lng);
         });
     }
 
     initMap(data.lat, data.lng);
+    // Optional: fetch initial address if search bar is empty
+    reverseGeocode(data.lat, data.lng);
 
     // Toggle Handler
     toggleSpoof.addEventListener('change', async (e) => {
@@ -82,12 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isNaN(lat) || isNaN(lng)) return;
 
         await chrome.storage.local.set({ lat, lng });
-        
+
         // Visual feedback
         const originalText = saveBtn.textContent;
         saveBtn.textContent = "Saved!";
         saveBtn.style.background = "var(--success)";
-        
+
         setTimeout(() => {
             saveBtn.textContent = originalText;
             saveBtn.style.background = "";
@@ -114,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
         const query = e.target.value.trim();
-        
+
         if (query.length < 3) {
             searchResults.classList.add('hidden');
             return;
@@ -127,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
             const results = await response.json();
-            
+
             searchResults.innerHTML = '';
             if (results.length === 0) {
                 searchResults.classList.add('hidden');
@@ -141,23 +145,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                 div.addEventListener('click', () => {
                     const lat = parseFloat(result.lat);
                     const lng = parseFloat(result.lon);
-                    
+
                     latInput.value = lat.toFixed(6);
                     lngInput.value = lng.toFixed(6);
-                    
+
                     const newLatLng = new L.LatLng(lat, lng);
                     marker.setLatLng(newLatLng);
                     map.setView(newLatLng, 15);
-                    
+
                     searchInput.value = result.display_name.split(',')[0];
                     searchResults.classList.add('hidden');
                 });
                 searchResults.appendChild(div);
             });
-            
+
             searchResults.classList.remove('hidden');
         } catch (error) {
             console.error("Search failed:", error);
+        }
+    }
+
+    async function reverseGeocode(lat, lng) {
+        try {
+            searchInput.placeholder = "Loading address...";
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+            const data = await response.json();
+
+            if (data && data.display_name) {
+                searchInput.value = data.display_name;
+            } else {
+                searchInput.value = '';
+                searchInput.placeholder = "Search street, city or country...";
+            }
+        } catch (error) {
+            console.error("Reverse geocoding failed:", error);
+            searchInput.placeholder = "Search street, city or country...";
         }
     }
 
