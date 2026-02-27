@@ -132,7 +132,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function performSearch(query) {
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'ChromeLocationChanger/1.0'
+                }
+            });
             const results = await response.json();
 
             searchResults.innerHTML = '';
@@ -171,7 +176,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function reverseGeocode(lat, lng) {
         try {
             searchInput.placeholder = "Loading address...";
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'ChromeLocationChanger/1.0'
+                }
+            });
             const data = await response.json();
 
             if (data && data.display_name) {
