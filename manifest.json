@@ -9,7 +9,7 @@
     "declarativeNetRequest"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "*://*.google.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -17,7 +17,7 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "*://*.google.com/*"
       ],
       "js": [
         "content.js"
@@ -27,7 +27,7 @@
     },
     {
       "matches": [
-        "<all_urls>"
+        "*://*.google.com/*"
       ],
       "js": [
         "inject.js"
@@ -52,7 +52,7 @@
         "inject.js"
       ],
       "matches": [
-        "<all_urls>"
+        "*://*.google.com/*"
       ]
     }
   ]
