@@ -15,7 +15,7 @@ Search Location Changer is a browser extension that allows users to override the
 
 ## 2. Developer Information
 
-- **Developer:** Danish Fareed
+- **Developer:** Danish Mohammed
 - **Contact:** For any privacy-related questions or concerns, please open an issue on our [GitHub repository](https://github.com/danishfareed/search-location-changer)
 - **Source Code:** The complete source code is publicly available at [https://github.com/danishfareed/search-location-changer](https://github.com/danishfareed/search-location-changer)
 
