@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Location Changer",
+  "name": "Search Location Changer",
   "version": "1.0",
   "description": "Override your HTML5 Geolocation and Google Search location natively. Search and lock to any coordinates worldwide.",
   "permissions": [
