@@ -16,33 +16,35 @@ function genUULE(latFloat, lngFloat) {
 }
 
 function updateNetRules(enabled, lat, lng) {
-    if (enabled) {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [1],
-            addRules: [{
-                "id": 1,
-                "priority": 1,
-                "action": {
-                    "type": "modifyHeaders",
-                    "requestHeaders": [
-                        {
-                            "header": "x-geo",
-                            "operation": "set",
-                            "value": genUULE(lat, lng)
-                        }
-                    ]
-                },
-                "condition": {
-                    "urlFilter": "google.com/",
-                    "resourceTypes": ["main_frame", "sub_frame", "xmlhttprequest", "ping"]
-                }
-            }]
-        });
-    } else {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [1]
-        });
-    }
+    return new Promise((resolve) => {
+        if (enabled) {
+            chrome.declarativeNetRequest.updateSessionRules({
+                removeRuleIds: [1],
+                addRules: [{
+                    "id": 1,
+                    "priority": 1,
+                    "action": {
+                        "type": "modifyHeaders",
+                        "requestHeaders": [
+                            {
+                                "header": "x-geo",
+                                "operation": "set",
+                                "value": genUULE(lat, lng)
+                            }
+                        ]
+                    },
+                    "condition": {
+                        "urlFilter": "google.com/",
+                        "resourceTypes": ["main_frame", "sub_frame", "xmlhttprequest", "ping"]
+                    }
+                }]
+            }, resolve);
+        } else {
+            chrome.declarativeNetRequest.updateSessionRules({
+                removeRuleIds: [1]
+            }, resolve);
+        }
+    });
 }
 
 function updateBadgeStatus(enabled) {
@@ -57,9 +59,11 @@ function updateBadgeStatus(enabled) {
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "TOGGLE_STATE_CHANGED" || request.type === "LOCATION_UPDATED") {
-        chrome.storage.local.get(['enabled', 'lat', 'lng'], (data) => {
+        chrome.storage.local.get(['enabled', 'lat', 'lng'], async (data) => {
             updateBadgeStatus(data.enabled);
-            updateNetRules(data.enabled, data.lat, data.lng);
+
+            // Wait for the header rule to be fully applied/removed before reloading tabs
+            await updateNetRules(data.enabled, data.lat, data.lng);
 
             // Notify all active tabs to update injected settings if they are already loaded
             chrome.tabs.query({}, (tabs) => {
@@ -71,8 +75,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                                 data: data
                             }).catch(() => { });
 
-                            // Force reload Google Search ONLY if it's the currently active tab
-                            if (tab.active && tab.url && tab.url.includes("google.com/search")) {
+                            // Force reload ALL open Google Search tabs
+                            if (tab.url && tab.url.includes("google.com/search")) {
                                 chrome.tabs.reload(tab.id);
                             }
                         } catch (e) { }
@@ -84,7 +88,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Initial badge and rules state
-chrome.storage.local.get(['enabled', 'lat', 'lng'], (data) => {
+chrome.storage.local.get(['enabled', 'lat', 'lng'], async (data) => {
     updateBadgeStatus(data.enabled);
-    updateNetRules(data.enabled, data.lat, data.lng);
+    await updateNetRules(data.enabled, data.lat, data.lng);
 });
